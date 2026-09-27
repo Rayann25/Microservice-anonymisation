@@ -11,13 +11,13 @@ st.set_page_config(
 STORAGE_DIR = os.path.abspath("./storage_vault")
 os.makedirs(STORAGE_DIR, exist_ok=True)
 
-# Styles CSS stricts : suppression des bugs de contrastes et des boîtes fantômes
+# CSS STRICT : forçage noir et blanc sur tous les sélecteurs de saisie
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 
-    /* Fond de l'application */
-    .stApp {
+    /* Fond global */
+    .stApp, html, body {
         background-color: #070709 !important;
         color: #f4f4f5 !important;
         font-family: 'Plus Jakarta Sans', sans-serif !important;
@@ -25,34 +25,42 @@ st.markdown("""
     
     #MainMenu, footer, header {visibility: hidden !important;}
 
-    /* Conteneurs de cartes (Remplace les balises HTML ouvertes) */
+    /* FORÇAGE ZONE DE TEXTE SOMBRE + TEXTE BLANC NET */
+    .stTextArea,
+    .stTextArea > div,
+    .stTextArea > div > div,
+    div[data-baseweb="textarea"],
+    div[data-baseweb="base-input"],
+    div[data-baseweb="textarea"] > textarea,
+    textarea {
+        background-color: #09090d !important;
+        background: #09090d !important;
+        color: #ffffff !important;
+        -webkit-text-fill-color: #ffffff !important;
+        border-color: #27272a !important;
+        caret-color: #a855f7 !important;
+        font-family: 'Plus Jakarta Sans', sans-serif !important;
+        font-size: 0.82rem !important;
+        line-height: 1.5 !important;
+    }
+
+    textarea:focus {
+        border-color: #9333ea !important;
+        box-shadow: 0 0 0 1px #9333ea !important;
+    }
+
+    textarea::placeholder {
+        color: #71717a !important;
+        -webkit-text-fill-color: #71717a !important;
+    }
+
+    /* Cartes conteneurs */
     div[data-testid="stVerticalBlockBorderWrapper"] > div {
         background-color: #0d0d12 !important;
         border: 1px solid rgba(168, 85, 247, 0.25) !important;
         box-shadow: 0 0 25px rgba(168, 85, 247, 0.08) !important;
         border-radius: 1rem !important;
         padding: 1.25rem !important;
-    }
-
-    /* FORÇAGE FOND SOMBRE ET TEXTE BLANC DANS LE CHAMP DE TEXTE */
-    div[data-baseweb="textarea"] {
-        background-color: #09090d !important;
-        border: 1px solid #27272a !important;
-        border-radius: 0.75rem !important;
-    }
-    div[data-baseweb="textarea"]:focus-within {
-        border-color: #a855f7 !important;
-        box-shadow: 0 0 0 1px #a855f7 !important;
-    }
-    div[data-baseweb="textarea"] textarea {
-        background-color: #09090d !important;
-        color: #ffffff !important;
-        caret-color: #a855f7 !important;
-        font-size: 0.82rem !important;
-        line-height: 1.5 !important;
-    }
-    div[data-baseweb="textarea"] textarea::placeholder {
-        color: #71717a !important;
     }
 
     /* Onglets de navigation */
@@ -83,7 +91,7 @@ st.markdown("""
         display: none !important;
     }
 
-    /* Boutons : Primaire (Violet gradient) et Secondaire (Gris sombre) */
+    /* Boutons */
     button[kind="primary"] {
         background: linear-gradient(to right, #9333ea, #4f46e5) !important;
         color: #ffffff !important;
@@ -139,7 +147,6 @@ tab_text, tab_pdf = st.tabs(["Flux Direct", "Document PDF"])
 with tab_text:
     col1, col2 = st.columns(2, gap="medium")
 
-    # CARTE DE GAUCHE : ENTRÉE SOURCE
     with col1:
         with st.container(border=True):
             col_t, col_c = st.columns([2, 1])
@@ -173,7 +180,6 @@ with tab_text:
                         st.session_state["restored_text"] = ""
                     st.rerun()
 
-    # CARTE DE DROITE : SORTIE PROTÉGÉE
     with col2:
         with st.container(border=True):
             count = st.session_state.get('entities_count', 0)
@@ -190,7 +196,7 @@ with tab_text:
             
             if sanitized_output:
                 st.markdown(f"""
-                    <div style="height: 180px; font-size: 0.80rem; padding: 0.875rem; border-radius: 0.75rem; background-color: #09090d; border: 1px solid #27272a; color: #f4f4f5; overflow-y: auto; white-space: pre-wrap; font-family: 'JetBrains Mono', monospace; line-height: 1.5; margin-bottom: 1rem;">{sanitized_output}</div>
+                    <div style="height: 180px; font-size: 0.80rem; padding: 0.875rem; border-radius: 0.75rem; background-color: #09090d; border: 1px solid #27272a; color: #ffffff; overflow-y: auto; white-space: pre-wrap; font-family: 'JetBrains Mono', monospace; line-height: 1.5; margin-bottom: 1rem;">{sanitized_output}</div>
                 """, unsafe_allow_html=True)
             else:
                 st.markdown("""
@@ -207,7 +213,6 @@ with tab_text:
                         st.session_state["restored_text"] = restored
                         st.rerun()
 
-    # BLOC VERT : CONTENU RECONSTITUÉ
     if st.session_state.get("restored_text"):
         st.markdown(f"""
             <div style="background-color: #0D0D12; border-radius: 1rem; padding: 1.25rem; border: 1px solid rgba(16,185,129,0.25); box-shadow: 0 0 20px rgba(16,185,129,0.06); margin-top: 1.5rem;">
