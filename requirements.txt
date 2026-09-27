@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+pydantic
+pymupdf
+cryptography
+torch
+transformers
+gliner
+python-multipart
