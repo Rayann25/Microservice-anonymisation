@@ -1,9 +1,6 @@
-fastapi
-uvicorn
-pydantic
-pymupdf
-cryptography
+streamlit
 torch
 transformers
 gliner
-python-multipart
+pymupdf
+cryptography
